@@ -1,0 +1,88 @@
+.panelfigures {
+  /* min-height: 450px; */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.node {
+  margin-bottom: 1rem;
+}
+.ovalnode {
+  height: 50px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ovalnode.init {
+  background-color: #fff0c7;
+  border: 1px solid #e4a700;
+}
+.ovalnode.init button,
+.ovalnode.end button {
+  /* color: #fff; */
+  font-size: 14px;
+}
+.ovalnode.end {
+  background-color: #dfffb4;
+  border: 1px solid #74cc00;
+}
+.tasknode {
+  height: 50px;
+  background-color: rgb(197, 197, 255);
+  border: 1px blue solid;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: blue;
+  font-weight: bold;
+  padding: 0 5px;
+  flex-direction: column;
+}
+.nodeinput {
+  background-color: rgba(255, 255, 255, 0.418);
+  border: none;
+  max-width: 100%;
+}
+
+.nodeinput:focus {
+  outline: none;
+}
+
+.nodebutton {
+  background-color: transparent;
+  border: none;
+  margin-top: 5px;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.diamondnode-container {
+  height: 120px;
+}
+
+ .diamondnode {
+  width: 85px;
+  height: 85px;
+  background-color: #ebd2ff;
+  transform: translate(-50%, -50%) rotate(45deg);
+  position: relative;
+  left: 50%;
+  top: 50%;
+  border-radius: 5px;
+  border: 1px solid #8c00ffc9;
+}
+
+.diamondnode .actions {
+  transform: translate(-50%, -50%) rotate(-45deg);
+  position: relative;
+  left: 50%;
+  top: 50%;
+  text-align: center;
+}
+.diamondnode input {
+  max-width: 100%;
+}
