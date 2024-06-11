@@ -12,16 +12,15 @@ import ReactFlow, {
   ReactFlowInstance,
   Panel,
   Connection,
-  MarkerType,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { ProcessNode } from "./Nodes/ProcessNode";
-import CustomEdge from "./Edges/CustomEdge";
 import DiamondNode from "./Nodes/DiamondNode";
 import { OvalNode } from "./Nodes/OvalNode";
 import "./App.css";
 import FloatingEdge from "./Edges/FloatingEdge";
-import CustomConnectionLine from "./CustomConnection";
+import CustomConnectionLine from "./Connections/CustomConnection";
+import DownloadButton from "./DownloadButton";
 
 const nodeTypes = {
   processNode: ProcessNode,
@@ -42,12 +41,12 @@ const edgeTypes = {
 
 const connectionLineStyle = {
   strokeWidth: 2,
-  stroke: 'black',
+  stroke: "black",
 };
 
 const defaultEdgeOptions = {
-  style: { strokeWidth: 2, stroke: 'black' },
-  type: 'simplebezier',
+  style: { strokeWidth: 2, stroke: "black" },
+  type: "simplebezier",
   animated: true,
   // markerEnd: {
   //   // type: MarkerType.ArrowClosed,
@@ -68,14 +67,26 @@ function App() {
   // const [edgeText, setEdgeText] = useState("");
   const [url, setUrl] = useState("");
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
+  const [isEditable, setIsEditable] = useState(false);
+  const [savedFlows, setSavedFlows] = useState<string[]>([]);
 
-  // const onSave = useCallback(() => {
-  //   if (rfInstance) {
-  //     const flow = rfInstance.toObject();
-  //     localStorage.setItem(flowKey, JSON.stringify(flow));
-  //     location.reload();
-  //   }
-  // }, [flowKey, rfInstance]);
+  const saveFlows = useCallback(() => {
+    setSavedFlows((prev) => [...prev, flowKey]);
+  }, [flowKey]);
+
+  const cleanBoard = () => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+    setFlowKey("");
+    setIsEditable(false);
+  };
+
+  const onSave = useCallback(() => {
+    if (rfInstance) {
+      const flow = rfInstance.toObject();
+      localStorage.setItem(flowKey, JSON.stringify(flow));
+    }
+  }, [flowKey, rfInstance]);
 
   // const onRestore = useCallback(() => {
   //   const restoreFlow = async () => {
@@ -126,7 +137,7 @@ function App() {
         data: {
           label: nodeLabel,
         },
-        position: { x: 0, y: 50 },
+        position: { x: 300, y: 100 },
       };
       setNodes((nds) => nds.concat(newNode));
     },
@@ -170,7 +181,7 @@ function App() {
   return (
     <ReactFlowProvider>
       <div style={{ height: "100vh" }}>
-        <h1>Flujo: {flowKey}</h1>
+        {/* <h1>Flujo: {flowKey}</h1> */}
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -222,97 +233,112 @@ function App() {
                   Añadir
                 </button>
               </div>
-              
-              <div className="diamondnode-container">
 
-              <div className="node diamondnode">
-                <div className="actions">
-                  <input
-                    className="nodeinput"
-                    type="text"
-                    value={nodeName.diamondNode}
-                    onChange={(e) =>
-                      settingNameNode("diamondNode", e.target.value)
+              <div className="diamondnode-container">
+                <div className="node diamondnode">
+                  <div className="actions">
+                    <input
+                      className="nodeinput"
+                      type="text"
+                      value={nodeName.diamondNode}
+                      onChange={(e) =>
+                        settingNameNode("diamondNode", e.target.value)
                       }
-                      />
-                  <button
-                    className="nodebutton"
-                    disabled={nodeName.diamondNode === "" ? true : false}
-                    onClick={() => addNode("diamondNode")}
+                    />
+                    <button
+                      className="nodebutton"
+                      disabled={nodeName.diamondNode === "" ? true : false}
+                      onClick={() => addNode("diamondNode")}
                     >
-                    Añadir
-                  </button>
+                      Añadir
+                    </button>
+                  </div>
                 </div>
               </div>
-                    </div>
             </div>
-            {/* <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                maxWidth: 150,
-              }}
-            >
-              <div>
-                Nombre del Flujo:
-                <input
-                  type="text"
-                  value={flowKey}
-                  onChange={(evt) => setFlowKey(evt.target.value)}
-                  placeholder="Enter node label"
-                />
-              </div>
-              Nombre nodo:
-              <input
-                type="text"
-                value={nodeName}
-                onChange={(evt) => setNodeName(evt.target.value)}
-                placeholder="Enter node label"
-              />
-              Url:
-              <input
-                type="text"
-                value={url}
-                onChange={(evt) => setUrl(evt.target.value)}
-                placeholder="Enter node url"
-              />
-              <div>
-                Desición:
-                <input
-                  type="text"
-                  value={edgeText}
-                  onChange={(e) => setEdgeText(e.target.value)}
-                />
-              </div>
-              Añadir nodo:
-              <button
-                disabled={nodeName === "" ? true : false}
-                onClick={addNode}
-              >
-                Add Node
+          </Panel>
+          <Panel position="top-center">
+            <div style={{ display: "flex" }}>
+              
+              {isEditable ? (
+                <h1>{flowKey.toUpperCase()}</h1>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <h2>Nombre del flujo:</h2>
+                  <input
+                    style={{
+                      height: 35,
+                      maxWidth: 150,
+                      border: "1px solid #e2e2e2",
+                      outline: "none",
+                      marginLeft: 10,
+                      fontSize: 25,
+                    }}
+                    type="text"
+                    value={flowKey}
+                    onChange={(e) => setFlowKey(e.target.value)}
+                  />
+                  <button
+                    onClick={() => {
+                      setIsEditable(true);
+                      saveFlows();
+                    }}
+                  >
+                    <svg
+                      style={{ height: 28 }}
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m4.5 12.75 6 6 9-13.5"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
+          </Panel>
+          <Panel position="top-left">
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <button onClick={onSave}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0 1 20.25 6v12A2.25 2.25 0 0 1 18 20.25H6A2.25 2.25 0 0 1 3.75 18V6A2.25 2.25 0 0 1 6 3.75h1.5m9 0h-9"
+                  />
+                </svg>
+              </button>
+              <DownloadButton />
+              <button onClick={cleanBoard}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
+                  />
+                </svg>
               </button>
             </div>
-            Guardar flujo:
-            <button onClick={onSave}>save</button>
-            <div>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                Buscar flujo:
-                <input
-                  type="text"
-                  value={searchFlow}
-                  onChange={(evt) => setSearchFlow(evt.target.value)}
-                  placeholder="Search flow"
-                />
-                <button
-                  disabled={searchFlow === "" ? true : false}
-                  onClick={onRestore}
-                >
-                  restore
-                </button>
-              </div>
-            </div>
-           <button onClick={onRestore}>restore</button>
-        <button onClick={onAdd}>add node</button> */}
           </Panel>
         </ReactFlow>
       </div>
